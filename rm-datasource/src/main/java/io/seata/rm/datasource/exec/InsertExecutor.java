@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.rm.datasource.exec;
 
 import io.seata.common.exception.NotSupportYetException;
@@ -26,6 +25,8 @@ import io.seata.rm.datasource.sql.struct.ColumnMeta;
 import io.seata.rm.datasource.sql.struct.Null;
 import io.seata.rm.datasource.sql.struct.TableMeta;
 import io.seata.rm.datasource.sql.struct.TableRecords;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +35,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * The type Insert executor.
@@ -45,6 +47,7 @@ import java.util.Map;
  */
 public class InsertExecutor<T, S extends Statement> extends AbstractDMLBaseExecutor<T, S> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(InsertExecutor.class);
     protected static final String ERR_SQL_STATE = "S1009";
 
     /**
@@ -135,6 +138,7 @@ public class InsertExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
             // specify Statement.RETURN_GENERATED_KEYS to
             // Statement.executeUpdate() or Connection.prepareStatement().
             if (ERR_SQL_STATE.equalsIgnoreCase(e.getSQLState())) {
+                LOGGER.warn("Fail to get auto-generated keys, use \'SELECT LAST_INSERT_ID()\' instead. Be cautious, statement could be polluted. Recommend you set the statement to return generated keys.");
                 genKeys = statementProxy.getTargetStatement().executeQuery("SELECT LAST_INSERT_ID()");
             } else {
                 throw e;
@@ -152,12 +156,12 @@ public class InsertExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
         TableRecords afterImage;
         String pk = getTableMeta().getPkName();
         StringBuffer selectSQLAppender = new StringBuffer("SELECT * FROM " + getTableMeta().getTableName() + " WHERE ");
-        for (int i = 1; i <= pkValues.size(); i++) {
-            selectSQLAppender.append(pk + "=?");
-            if (i < pkValues.size()) {
-                selectSQLAppender.append(" OR ");
-            }
+
+        StringJoiner pkValuesJoiner = new StringJoiner(" OR ");
+        for (Object pkValue:pkValues) {
+            pkValuesJoiner.add(pk + "=?");
         }
+        selectSQLAppender.append(pkValuesJoiner.toString());
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {

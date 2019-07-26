@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,17 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.rm.datasource;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import com.alibaba.druid.util.JdbcUtils;
+
 import io.seata.core.model.BranchType;
 import io.seata.core.model.Resource;
 import io.seata.rm.DefaultResourceManager;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * The type Data source proxy.
@@ -39,8 +40,6 @@ public class DataSourceProxy extends AbstractDataSourceProxy implements Resource
     private String jdbcUrl;
 
     private String dbType;
-
-    private boolean managed = false;
 
     /**
      * Instantiates a new Data source proxy.
@@ -68,15 +67,9 @@ public class DataSourceProxy extends AbstractDataSourceProxy implements Resource
             jdbcUrl = connection.getMetaData().getURL();
             dbType = JdbcUtils.getDbType(jdbcUrl, null);
         } catch (SQLException e) {
-            throw new IllegalStateException(String.format("can not init dataSource :%s", e.getSQLState()));
+            throw new IllegalStateException("can not init dataSource", e);
         }
-    }
-
-    private void assertManaged() {
-        if (!managed) {
-            DefaultResourceManager.get().registerResource(this);
-            managed = true;
-        }
+        DefaultResourceManager.get().registerResource(this);
     }
 
     /**
@@ -100,14 +93,12 @@ public class DataSourceProxy extends AbstractDataSourceProxy implements Resource
 
     @Override
     public ConnectionProxy getConnection() throws SQLException {
-        assertManaged();
         Connection targetConnection = targetDataSource.getConnection();
         return new ConnectionProxy(this, targetConnection);
     }
 
     @Override
     public ConnectionProxy getConnection(String username, String password) throws SQLException {
-        assertManaged();
         Connection targetConnection = targetDataSource.getConnection(username, password);
         return new ConnectionProxy(this, targetConnection);
     }
@@ -119,7 +110,11 @@ public class DataSourceProxy extends AbstractDataSourceProxy implements Resource
 
     @Override
     public String getResourceId() {
-        return jdbcUrl;
+        if (jdbcUrl.contains("?")) {
+            return jdbcUrl.substring(0, jdbcUrl.indexOf("?"));
+        } else {
+            return jdbcUrl;
+        }
     }
 
     @Override

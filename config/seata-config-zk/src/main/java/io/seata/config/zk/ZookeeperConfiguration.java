@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.config.zk;
 
 import java.util.List;
@@ -50,7 +49,7 @@ public class ZookeeperConfiguration extends AbstractConfiguration<IZkDataListene
     private static final String ZK_PATH_SPLIT_CHAR = "/";
     private static final String FILE_ROOT_CONFIG = "config";
     private static final String ROOT_PATH = ZK_PATH_SPLIT_CHAR + FILE_ROOT_CONFIG;
-    private static final Configuration FILE_CONFIG = ConfigurationFactory.FILE_INSTANCE;
+    private static final Configuration FILE_CONFIG = ConfigurationFactory.CURRENT_FILE_INSTANCE;
     private static final String SERVER_ADDR_KEY = "serverAddr";
     private static final String SESSION_TIMEOUT_KEY = "session.timeout";
     private static final String CONNECT_TIMEOUT_KEY = "connect.timeout";
@@ -131,7 +130,7 @@ public class ZookeeperConfiguration extends AbstractConfiguration<IZkDataListene
 
     @Override
     public boolean putConfigIfAbsent(String dataId, String content, long timeoutMills) {
-        throw new NotSupportYetException("not support atom operation putConfigIfAbsent");
+        throw new NotSupportYetException("not support atomic operation putConfigIfAbsent");
     }
 
     @Override

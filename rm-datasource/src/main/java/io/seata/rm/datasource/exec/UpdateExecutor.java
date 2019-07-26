@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.rm.datasource.exec;
 
 import java.sql.PreparedStatement;
@@ -22,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import io.seata.rm.datasource.ParametersHolder;
 import io.seata.rm.datasource.StatementProxy;
@@ -134,15 +134,14 @@ public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
             // PK should be included.
             selectSQLAppender.append(getColumnNameInSQL(tmeta.getPkName()) + ", ");
         }
-        for (int i = 0; i < updateColumns.size(); i++) {
-            selectSQLAppender.append(updateColumns.get(i));
-            if (i < (updateColumns.size() - 1)) {
-                selectSQLAppender.append(", ");
-            }
+        StringJoiner columnsSQL = new StringJoiner(", ");
+        for (String column:updateColumns) {
+            columnsSQL.add(column);
         }
+        selectSQLAppender.append(columnsSQL.toString());
         List<Field> pkRows = beforeImage.pkRows();
         selectSQLAppender.append(
-            " FROM " + getFromTableInSQL() + " WHERE " + buildWhereConditionByPKs(pkRows) + " FOR UPDATE");
+            " FROM " + getFromTableInSQL() + " WHERE " + buildWhereConditionByPKs(pkRows));
         String selectSQL = selectSQLAppender.toString();
 
         TableRecords afterImage = null;

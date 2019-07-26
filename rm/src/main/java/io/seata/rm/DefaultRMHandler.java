@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,8 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.rm;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.seata.common.exception.FrameworkException;
 import io.seata.common.loader.EnhancedServiceLoader;
@@ -26,10 +29,6 @@ import io.seata.core.protocol.transaction.BranchCommitResponse;
 import io.seata.core.protocol.transaction.BranchRollbackRequest;
 import io.seata.core.protocol.transaction.BranchRollbackResponse;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * the default RM event handler implement, deal with the phase two events
  *
@@ -37,16 +36,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultRMHandler extends AbstractRMHandler {
 
-    protected static Map<BranchType, AbstractRMHandler> allRMHandlersMap = new ConcurrentHashMap<BranchType, AbstractRMHandler>();
+    protected static Map<BranchType, AbstractRMHandler> allRMHandlersMap
+        = new ConcurrentHashMap<BranchType, AbstractRMHandler>();
 
-    protected DefaultRMHandler(){
+    protected DefaultRMHandler() {
         initRMHandlers();
     }
 
-    protected void initRMHandlers(){
+    protected void initRMHandlers() {
         List<AbstractRMHandler> allRMHandlers = EnhancedServiceLoader.loadAll(AbstractRMHandler.class);
-        if(CollectionUtils.isNotEmpty(allRMHandlers)){
-            for(AbstractRMHandler rmHandler : allRMHandlers){
+        if (CollectionUtils.isNotEmpty(allRMHandlers)) {
+            for (AbstractRMHandler rmHandler : allRMHandlers) {
                 allRMHandlersMap.put(rmHandler.getBranchType(), rmHandler);
             }
         }
@@ -62,7 +62,7 @@ public class DefaultRMHandler extends AbstractRMHandler {
         return getRMHandler(request.getBranchType()).handle(request);
     }
 
-    protected AbstractRMHandler getRMHandler(BranchType branchType){
+    protected AbstractRMHandler getRMHandler(BranchType branchType) {
         return allRMHandlersMap.get(branchType);
     }
 

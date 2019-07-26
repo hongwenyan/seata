@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public final class TransactionInfo implements Serializable {
     }
 
     public void setTimeOut(int timeOut) {
-        this.timeOut=timeOut;
+        this.timeOut = timeOut;
     }
 
     public String getName() {
@@ -45,7 +45,7 @@ public final class TransactionInfo implements Serializable {
     }
 
     public void setName(String name) {
-        this.name=name;
+        this.name = name;
     }
 
     public Set<RollbackRule> getRollbackRules() {
@@ -53,7 +53,7 @@ public final class TransactionInfo implements Serializable {
     }
 
     public void setRollbackRules(Set<RollbackRule> rollbackRules) {
-        this.rollbackRules=rollbackRules;
+        this.rollbackRules = rollbackRules;
     }
 
     public boolean rollbackOn(Throwable ex) {

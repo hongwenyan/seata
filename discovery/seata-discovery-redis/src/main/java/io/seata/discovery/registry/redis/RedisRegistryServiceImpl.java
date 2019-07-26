@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.discovery.registry.redis;
 
 import java.lang.management.ManagementFactory;
@@ -34,8 +33,6 @@ import io.seata.common.util.NetUtil;
 import io.seata.common.util.StringUtils;
 import io.seata.config.Configuration;
 import io.seata.config.ConfigurationFactory;
-
-import io.seata.discovery.registry.RegistryService;
 import io.seata.discovery.registry.RegistryService;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
@@ -69,13 +66,13 @@ public class RedisRegistryServiceImpl implements RegistryService<RedisListener> 
         new NamedThreadFactory("RedisRegistryService", 1));
 
     private RedisRegistryServiceImpl() {
-        Configuration seataConfig = ConfigurationFactory.FILE_INSTANCE;
+        Configuration seataConfig = ConfigurationFactory.CURRENT_FILE_INSTANCE;
         this.clusterName = seataConfig.getConfig(REDIS_FILEKEY_PREFIX + REGISTRY_CLUSTER_KEY, DEFAULT_CLUSTER);
         String password = seataConfig.getConfig(getRedisPasswordFileKey());
         String serverAddr = seataConfig.getConfig(getRedisAddrFileKey());
         String[] serverArr = serverAddr.split(":");
         String host = serverArr[0];
-        int port = Integer.valueOf(serverArr[1]);
+        int port = Integer.parseInt(serverArr[1]);
         int db = seataConfig.getInt(getRedisDbFileKey());
         GenericObjectPoolConfig redisConfig = new GenericObjectPoolConfig();
         redisConfig.setTestOnBorrow(seataConfig.getBoolean(REDIS_FILEKEY_PREFIX + "test.on.borrow", true));
@@ -98,7 +95,7 @@ public class RedisRegistryServiceImpl implements RegistryService<RedisListener> 
             redisConfig.setMaxTotal(maxTotal);
         }
         int maxWait = seataConfig.getInt(REDIS_FILEKEY_PREFIX + "max.wait",
-                seataConfig.getInt(REDIS_FILEKEY_PREFIX + "timeout", 0));
+            seataConfig.getInt(REDIS_FILEKEY_PREFIX + "timeout", 0));
         if (maxWait > 0) {
             redisConfig.setMaxWaitMillis(maxWait);
         }
@@ -206,13 +203,13 @@ public class RedisRegistryServiceImpl implements RegistryService<RedisListener> 
             } finally {
                 jedis.close();
             }
-            if (null != instances) {
-                Set<InetSocketAddress> newAddressList = new HashSet<>();
+            if (null != instances && !instances.isEmpty()) {
+                Set<InetSocketAddress> newAddressSet = new HashSet<>();
                 for (Map.Entry<String, String> instance : instances.entrySet()) {
                     String serverAddr = instance.getKey();
-                    newAddressList.add(NetUtil.toInetSocketAddress(serverAddr));
+                    newAddressSet.add(NetUtil.toInetSocketAddress(serverAddr));
                 }
-                CLUSTER_ADDRESS_MAP.put(clusterName, newAddressList);
+                CLUSTER_ADDRESS_MAP.put(clusterName, newAddressSet);
             }
             subscribe(clusterName, new RedisListener() {
                 @Override
@@ -228,7 +225,7 @@ public class RedisRegistryServiceImpl implements RegistryService<RedisListener> 
                             CLUSTER_ADDRESS_MAP.get(clusterName).remove(NetUtil.toInetSocketAddress(serverAddr));
                             break;
                         default:
-                            throw new ShouldNeverHappenException("unknow redis msg:" + msg);
+                            throw new ShouldNeverHappenException("unknown redis msg:" + msg);
                     }
                 }
             });

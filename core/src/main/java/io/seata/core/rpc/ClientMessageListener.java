@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.core.rpc;
+
+import io.seata.core.protocol.RpcMessage;
 
 /**
  * The interface Client message listener.
@@ -26,10 +27,9 @@ public interface ClientMessageListener {
     /**
      * On message.
      *
-     * @param msgId         the msg id
+     * @param request       the msg id
      * @param serverAddress the server address
-     * @param msg           the msg
      * @param sender        the sender
      */
-    void onMessage(long msgId, String serverAddress, Object msg, ClientMessageSender sender);
+    void onMessage(RpcMessage request, String serverAddress, ClientMessageSender sender);
 }

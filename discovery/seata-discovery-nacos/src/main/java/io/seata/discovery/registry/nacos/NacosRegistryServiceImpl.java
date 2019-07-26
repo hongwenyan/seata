@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.discovery.registry.nacos;
 
 import java.net.InetSocketAddress;
@@ -48,7 +47,7 @@ public class NacosRegistryServiceImpl implements RegistryService<EventListener> 
     private static final String PRO_NAMESPACE_KEY = "namespace";
     private static final String REGISTRY_TYPE = "nacos";
     private static final String REGISTRY_CLUSTER = "cluster";
-    private static final Configuration FILE_CONFIG = ConfigurationFactory.FILE_INSTANCE;
+    private static final Configuration FILE_CONFIG = ConfigurationFactory.CURRENT_FILE_INSTANCE;
     private static volatile NamingService naming;
     private static final ConcurrentMap<String, List<EventListener>> LISTENER_SERVICE_MAP = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, List<InetSocketAddress>> CLUSTER_ADDRESS_MAP = new ConcurrentHashMap<>();

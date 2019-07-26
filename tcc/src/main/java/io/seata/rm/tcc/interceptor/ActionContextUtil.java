@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,9 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.rm.tcc.interceptor;
-
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -52,13 +50,13 @@ public class ActionContextUtil {
                 Annotation annotation = f.getAnnotation(BusinessActionContextParameter.class);
 
                 if (annotation != null) {
-                    BusinessActionContextParameter param = (BusinessActionContextParameter) annotation;
+                    BusinessActionContextParameter param = (BusinessActionContextParameter)annotation;
                     f.setAccessible(true);
                     Object paramObject = f.get(targetParam);
                     int index = param.index();
                     if (index >= 0) {
                         @SuppressWarnings("unchecked")
-						Object targetObject = ((List<Object>) paramObject).get(index);
+                        Object targetObject = ((List<Object>)paramObject).get(index);
                         if (param.isParamInProperty()) {
                             context.putAll(fetchContextFromObject(targetObject));
                         } else {
@@ -103,6 +101,5 @@ public class ActionContextUtil {
         }
         getAllField(interFace.getSuperclass(), fields);
     }
-
 
 }

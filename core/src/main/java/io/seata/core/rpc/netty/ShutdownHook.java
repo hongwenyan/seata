@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,17 +13,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.core.rpc.netty;
+
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.seata.common.util.CollectionUtils;
 import io.seata.core.rpc.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * ensure the shutdownHook is singleton
@@ -54,15 +53,15 @@ public class ShutdownHook extends Thread {
         super(name);
     }
 
-    public static ShutdownHook getInstance(){
+    public static ShutdownHook getInstance() {
         return SHUTDOWN_HOOK;
     }
 
-    public void addDisposable(Disposable disposable){
+    public void addDisposable(Disposable disposable) {
         addDisposable(disposable, DEFAULT_PRIORITY);
     }
 
-    public void addDisposable(Disposable disposable, int priority){
+    public void addDisposable(Disposable disposable, int priority) {
         disposables.add(new DisposablePriorityWrapper(disposable, priority));
     }
 
@@ -73,10 +72,10 @@ public class ShutdownHook extends Thread {
 
     public void destroyAll() {
 
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("destoryAll starting");
         }
-        if (!destroyed.compareAndSet(false, true) && CollectionUtils.isEmpty(disposables)){
+        if (!destroyed.compareAndSet(false, true) && CollectionUtils.isEmpty(disposables)) {
             return;
         }
         for (Disposable disposable : disposables) {
@@ -87,7 +86,7 @@ public class ShutdownHook extends Thread {
     /**
      * for spring context
      */
-    public static void removeRuntimeShutdownHook(){
+    public static void removeRuntimeShutdownHook() {
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
     }
 

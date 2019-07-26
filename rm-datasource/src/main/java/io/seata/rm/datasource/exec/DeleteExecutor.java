@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.rm.datasource.exec;
 
 import java.sql.PreparedStatement;
@@ -22,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import com.alibaba.druid.util.JdbcConstants;
 import io.seata.rm.datasource.ParametersHolder;
@@ -30,8 +30,6 @@ import io.seata.rm.datasource.sql.SQLDeleteRecognizer;
 import io.seata.rm.datasource.sql.SQLRecognizer;
 import io.seata.rm.datasource.sql.struct.TableMeta;
 import io.seata.rm.datasource.sql.struct.TableRecords;
-import io.seata.rm.datasource.undo.KeywordChecker;
-import io.seata.rm.datasource.undo.KeywordCheckerFactory;
 
 import io.seata.rm.datasource.undo.KeywordChecker;
 import io.seata.rm.datasource.undo.KeywordCheckerFactory;
@@ -69,15 +67,12 @@ public class DeleteExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
         for (String column : tmeta.getAllColumns().keySet()) {
             columns.add(keywordChecker.checkAndReplace(column));
         }
-
         StringBuffer selectSQLAppender = new StringBuffer("SELECT ");
-
-        for (int i = 0; i < columns.size(); i++) {
-            selectSQLAppender.append(getColumnNameInSQL(columns.get(i)));
-            if (i < (columns.size() - 1)) {
-                selectSQLAppender.append(", ");
-            }
+        StringJoiner columnSQL = new StringJoiner(", ");
+        for (String column:columns) {
+            columnSQL.add(getColumnNameInSQL(column));
         }
+        selectSQLAppender.append(columnSQL.toString());
         String whereCondition = null;
         ArrayList<Object> paramAppender = new ArrayList<>();
         if (statementProxy instanceof ParametersHolder) {

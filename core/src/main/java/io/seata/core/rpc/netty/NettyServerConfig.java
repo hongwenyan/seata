@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2018 Alibaba Group Holding Ltd.
+ *  Copyright 1999-2019 Seata.io Group.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.seata.core.rpc.netty;
 
 import io.netty.buffer.PooledByteBufAllocator;
@@ -49,7 +48,7 @@ public class NettyServerConfig extends NettyBaseConfig {
     /**
      * Shutdown timeout default 1s
      */
-    private static final int DEFAULT_SHUTDOWN_TIMEOUT_SEC = 1;
+    private static final int DEFAULT_SHUTDOWN_TIMEOUT_SEC = 3;
 
     /**
      * The Server channel clazz.
